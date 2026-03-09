@@ -1,370 +1,1478 @@
 <!DOCTYPE html>
-<html lang="pl">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HTorino Brief</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Songwriting Camp Brief</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet">
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #0E0E0E;
+      --bg-raised: #151515;
+      --bg-input: #1A1A1A;
+      --border: #252525;
+      --border-focus: #C9A96E;
+      --accent: #C9A96E;
+      --accent-dim: rgba(201, 169, 110, 0.12);
+      --accent-glow: rgba(201, 169, 110, 0.25);
+      --text: #FFFFFF;
+      --text-secondary: #8A8A8A;
+      --text-muted: #555555;
+      --error: #E05252;
+      --font-display: 'Instrument Serif', Georgia, serif;
+      --font-body: 'Plus Jakarta Sans', system-ui, sans-serif;
+      --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+      --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
     }
+
+    html { font-size: 16px; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
 
     body {
-      background: #000;
-      color: #fff;
-      font-family: Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-weight: 400;
+      line-height: 1.6;
       min-height: 100vh;
+      overflow-x: hidden;
     }
 
-    .page {
+    #header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      opacity: 0;
+      transform: translateY(-100%);
+      transition: opacity 0.5s var(--ease-out), transform 0.5s var(--ease-out);
+      pointer-events: none;
+    }
+    #header.visible {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    .progress-track {
+      height: 3px;
+      background: var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: var(--accent);
+      width: 0%;
+      transition: width 0.6s var(--ease-out);
+      position: relative;
+    }
+    .progress-fill::after {
+      content: '';
+      position: absolute;
+      top: 0; right: 0; bottom: 0;
+      width: 80px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      animation: shimmer 2s infinite;
+    }
+    @keyframes shimmer { 0% { transform: translateX(-80px); } 100% { transform: translateX(80px); } }
+
+    .step-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 28px;
+      background: linear-gradient(180deg, rgba(14,14,14,0.95) 0%, rgba(14,14,14,0) 100%);
+    }
+    .step-info .step-fraction {
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+    .step-info .step-fraction span { color: var(--accent); }
+    .step-info .step-name {
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    #app {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 0 24px;
       min-height: 100vh;
       display: flex;
+      flex-direction: column;
+    }
+
+    .step {
+      display: none;
+      flex-direction: column;
+      min-height: 100vh;
+      padding: 60px 0 40px;
+      opacity: 0;
+      transform: translateY(24px);
+    }
+    .step.active {
+      display: flex;
+      animation: stepIn 0.6s var(--ease-out) forwards;
+    }
+    .step.exiting {
+      display: flex;
+      animation: stepOut 0.35s var(--ease-out) forwards;
+    }
+    @keyframes stepIn {
+      0% { opacity: 0; transform: translateY(24px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes stepOut {
+      0% { opacity: 1; transform: translateY(0); }
+      100% { opacity: 0; transform: translateY(-16px); }
+    }
+
+    .step-content { flex: 1; }
+
+    .welcome-content {
+      display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 32px 20px;
-    }
-
-    .container {
-      width: 100%;
-      max-width: 720px;
       text-align: center;
+      min-height: 80vh;
+      padding: 40px 0;
     }
-
-    .screen {
-      display: none;
-    }
-
-    .screen.active {
-      display: block;
-    }
-
-    h1 {
-      font-size: 36px;
-      font-weight: 700;
-      margin-bottom: 16px;
-      letter-spacing: 0.02em;
-    }
-
-    p {
-      font-size: 16px;
-      line-height: 1.6;
-      color: #cfcfcf;
+    .welcome-eyebrow {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--accent);
       margin-bottom: 32px;
+      opacity: 0;
+      animation: fadeUp 0.7s var(--ease-out) 0.1s forwards;
+    }
+    .welcome-title {
+      font-family: var(--font-display);
+      font-style: italic;
+      font-size: clamp(2.8rem, 8vw, 4.5rem);
+      font-weight: 400;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      margin-bottom: 28px;
+      opacity: 0;
+      animation: fadeUp 0.7s var(--ease-out) 0.25s forwards;
+    }
+    .welcome-divider {
+      width: 48px;
+      height: 2px;
+      background: var(--accent);
+      margin-bottom: 28px;
+      opacity: 0;
+      animation: fadeUp 0.7s var(--ease-out) 0.4s forwards;
+    }
+    .welcome-text {
+      font-size: 1rem;
+      line-height: 1.7;
+      color: var(--text-secondary);
+      max-width: 440px;
+      margin-bottom: 48px;
+      opacity: 0;
+      animation: fadeUp 0.7s var(--ease-out) 0.5s forwards;
+    }
+    .welcome-cta {
+      opacity: 0;
+      animation: fadeUp 0.7s var(--ease-out) 0.65s forwards;
+    }
+    @keyframes fadeUp {
+      0% { opacity: 0; transform: translateY(16px); }
+      100% { opacity: 1; transform: translateY(0); }
     }
 
-    .buttons {
-      display: flex;
-      gap: 16px;
-      justify-content: center;
-      flex-wrap: wrap;
-      margin-top: 24px;
+    .form-step-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 10px;
+      margin-top: 20px;
     }
-
-    button {
-      background: #fff;
-      color: #000;
-      border: none;
-      padding: 14px 24px;
-      font-size: 15px;
-      cursor: pointer;
-      min-width: 160px;
-      transition: 0.2s ease;
-    }
-
-    button:hover {
-      opacity: 0.85;
-    }
-
-    .secondary-button {
-      background: transparent;
-      color: #fff;
-      border: 1px solid #666;
-    }
-
-    form {
-      text-align: left;
-      margin-top: 32px;
-    }
-
-    .field {
-      margin-bottom: 20px;
-    }
-
-    label {
-      display: block;
+    .form-step-title {
+      font-family: var(--font-display);
+      font-style: italic;
+      font-size: clamp(1.8rem, 5vw, 2.6rem);
+      font-weight: 400;
+      line-height: 1.1;
       margin-bottom: 8px;
-      font-size: 14px;
-      color: #ddd;
+    }
+    .form-step-desc {
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      margin-bottom: 36px;
+      line-height: 1.6;
     }
 
-    input,
+    .form-group {
+      margin-bottom: 24px;
+    }
+    .form-group label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+    .form-group label .optional {
+      font-weight: 400;
+      color: var(--text-muted);
+      font-size: 0.78rem;
+    }
+
+    input[type="text"],
+    input[type="url"],
+    input[type="date"],
+    textarea,
     select {
       width: 100%;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 10px;
       padding: 14px 16px;
-      background: #111;
-      color: #fff;
-      border: 1px solid #333;
-      font-size: 15px;
+      font-family: var(--font-body);
+      font-size: 1rem;
+      font-weight: 400;
+      color: var(--text);
       outline: none;
+      transition: border-color 0.3s, box-shadow 0.3s;
+      -webkit-appearance: none;
+    }
+    input::placeholder, textarea::placeholder { color: var(--text-muted); }
+    input:focus, textarea:focus, select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-dim);
     }
 
-    input:focus,
-    select:focus {
-      border-color: #888;
+    select {
+      cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='7' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238A8A8A' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 16px center;
+      padding-right: 40px;
+    }
+    select option { background: var(--bg-input); color: var(--text); }
+
+    textarea { resize: vertical; min-height: 100px; line-height: 1.6; }
+
+    .inline-fields {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+    }
+    @media (max-width: 480px) {
+      .inline-fields { grid-template-columns: 1fr; }
     }
 
-    .form-buttons {
+    .pill-group {
       display: flex;
-      gap: 16px;
-      justify-content: space-between;
       flex-wrap: wrap;
-      margin-top: 32px;
+      gap: 10px;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 10px 20px;
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.25s var(--ease-out);
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .pill:hover { border-color: var(--text-muted); color: var(--text); }
+    .pill.selected {
+      border-color: var(--accent);
+      background: var(--accent-dim);
+      color: var(--accent);
+      box-shadow: 0 0 0 1px var(--accent);
     }
 
-    .form-buttons button {
+    .energy-selector {
+      display: flex;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      position: relative;
+    }
+    .energy-option {
       flex: 1;
-      min-width: 180px;
+      padding: 16px 12px;
+      text-align: center;
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.3s var(--ease-out);
+      position: relative;
+      z-index: 1;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .energy-option:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      right: 0; top: 25%; bottom: 25%;
+      width: 1px;
+      background: var(--border);
+      transition: opacity 0.3s;
+    }
+    .energy-option:hover { color: var(--text); }
+    .energy-option.selected {
+      background: var(--accent);
+      color: var(--bg);
+      font-weight: 600;
+    }
+    .energy-option.selected::after { opacity: 0; }
+
+    .upload-zone {
+      border: 2px dashed var(--border);
+      border-radius: 12px;
+      padding: 32px 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s var(--ease-out);
+      position: relative;
+    }
+    .upload-zone:hover { border-color: var(--text-muted); background: rgba(255,255,255,0.02); }
+    .upload-zone.has-file { border-color: var(--accent); border-style: solid; background: var(--accent-dim); }
+    .upload-zone input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+    }
+    .upload-icon {
+      width: 40px; height: 40px;
+      margin: 0 auto 12px;
+      border-radius: 50%;
+      background: var(--accent-dim);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .upload-icon svg { width: 18px; height: 18px; stroke: var(--accent); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .upload-label { font-size: 0.88rem; color: var(--text-secondary); }
+    .upload-label strong { color: var(--accent); font-weight: 600; }
+    .upload-filename {
+      margin-top: 8px;
+      font-size: 0.82rem;
+      color: var(--accent);
+      font-weight: 500;
+      display: none;
+    }
+    .upload-zone.has-file .upload-filename { display: block; }
+
+    .ref-links-list { display: flex; flex-direction: column; gap: 10px; }
+    .ref-link-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .ref-link-row input { flex: 1; }
+    .ref-link-num {
+      width: 26px; height: 26px;
+      border-radius: 50%;
+      background: var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.72rem; font-weight: 700;
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+    .add-ref-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 8px;
+      padding: 8px 0;
+      background: none; border: none;
+      font-family: var(--font-body);
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--accent);
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .add-ref-btn:hover { opacity: 0.7; }
+    .add-ref-btn svg { width: 14px; height: 14px; stroke: var(--accent); fill: none; stroke-width: 2.5; }
+
+    .instrument-presets {
+      margin-bottom: 14px;
+    }
+    .instrument-note {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      font-style: italic;
+      margin-bottom: 12px;
+      line-height: 1.5;
+    }
+    .instrument-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .instrument-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 8px 16px;
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.25s var(--ease-out);
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .instrument-pill:hover { border-color: var(--text-muted); color: var(--text); }
+    .instrument-pill.selected {
+      border-color: var(--accent);
+      background: var(--accent-dim);
+      color: var(--accent);
+      box-shadow: 0 0 0 1px var(--accent);
     }
 
-    .logo {
-      font-size: 14px;
-      letter-spacing: 0.25em;
-      color: #888;
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 15px 36px;
+      border: none;
+      border-radius: 100px;
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s var(--ease-out);
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: var(--bg);
+    }
+    .btn-primary:hover { background: #d4b57a; transform: translateY(-1px); box-shadow: 0 4px 20px var(--accent-glow); }
+    .btn-primary:active { transform: translateY(0); }
+    .btn-secondary {
+      background: transparent;
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover { border-color: var(--text-muted); color: var(--text); }
+
+    .nav-buttons {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 32px 0 24px;
+      margin-top: auto;
+    }
+    .nav-buttons .btn-secondary { padding: 15px 28px; }
+
+    .review-section {
       margin-bottom: 28px;
+      padding: 24px;
+      background: var(--bg-raised);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+    }
+    .review-section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+    }
+    .review-section-title {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+    .review-edit-btn {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: none; border: none;
+      cursor: pointer;
+      font-family: var(--font-body);
+      transition: color 0.2s;
+      padding: 4px 8px;
+    }
+    .review-edit-btn:hover { color: var(--accent); }
+
+    .review-row {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      margin-bottom: 14px;
+    }
+    .review-row:last-child { margin-bottom: 0; }
+    .review-label {
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .review-value {
+      font-size: 0.95rem;
+      color: var(--text);
+      line-height: 1.5;
+      word-break: break-word;
+    }
+    .review-value.empty { color: var(--text-muted); font-style: italic; }
+    .review-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 4px;
+    }
+    .review-pill {
+      display: inline-block;
+      padding: 4px 14px;
+      border: 1px solid var(--accent);
+      border-radius: 100px;
+      font-size: 0.78rem;
+      color: var(--accent);
+      background: var(--accent-dim);
     }
 
-    @media (max-width: 640px) {
-      h1 {
-        font-size: 28px;
-      }
+    .confirm-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      min-height: 70vh;
+    }
+    .confirm-check {
+      width: 80px; height: 80px;
+      border-radius: 50%;
+      background: var(--accent-dim);
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 32px;
+      opacity: 0;
+      animation: scaleIn 0.5s var(--ease-out) 0.1s forwards;
+    }
+    .confirm-check svg { width: 36px; height: 36px; stroke: var(--accent); fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+    .confirm-check svg path {
+      stroke-dasharray: 50;
+      stroke-dashoffset: 50;
+      animation: drawCheck 0.4s var(--ease-out) 0.4s forwards;
+    }
+    @keyframes scaleIn {
+      0% { opacity: 0; transform: scale(0.5); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+    @keyframes drawCheck {
+      to { stroke-dashoffset: 0; }
+    }
+    .confirm-title {
+      font-family: var(--font-display);
+      font-style: italic;
+      font-size: clamp(2rem, 5vw, 2.8rem);
+      margin-bottom: 12px;
+      opacity: 0;
+      animation: fadeUp 0.6s var(--ease-out) 0.3s forwards;
+    }
+    .confirm-text {
+      font-size: 1rem;
+      color: var(--text-secondary);
+      max-width: 380px;
+      margin-bottom: 40px;
+      opacity: 0;
+      animation: fadeUp 0.6s var(--ease-out) 0.45s forwards;
+    }
+    .confirm-actions {
+      opacity: 0;
+      animation: fadeUp 0.6s var(--ease-out) 0.6s forwards;
+    }
 
-      .buttons,
-      .form-buttons {
-        flex-direction: column;
-      }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
 
-      button {
-        width: 100%;
-      }
+    #langScreen.hidden { display: none; }
+    .lang-buttons { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
+    .lang-buttons .btn { min-width: 170px; }
+
+    @media (max-width: 480px) {
+      #app { padding: 0 18px; }
+      .step { padding: 52px 0 32px; }
+      .review-section { padding: 18px; }
+      .nav-buttons .btn { padding: 14px 24px; font-size: 0.88rem; }
+      .energy-option { padding: 14px 8px; font-size: 0.82rem; }
     }
   </style>
 </head>
 <body>
-  <div class="page">
-    <div class="container">
-
-      <!-- SCREEN 1: LANGUAGE -->
-      <section id="screen-language" class="screen active">
-        <div class="logo">HTORINO</div>
-        <h1>Choose Language</h1>
-        <p>Wybierz język formularza.</p>
-
-        <div class="buttons">
-          <button type="button" onclick="selectLanguage('en')">English</button>
-          <button type="button" onclick="selectLanguage('pl')">Polski</button>
-        </div>
-      </section>
-
-      <!-- SCREEN 2: WELCOME -->
-      <section id="screen-welcome" class="screen">
-        <div class="logo">HTORINO</div>
-        <h1 id="welcome-title">Welcome</h1>
-        <p id="welcome-text">
-          This brief will help us understand your project and your needs.
-        </p>
-
-        <div class="buttons">
-          <button type="button" id="welcome-start-button" onclick="goToArtistProject()">Start</button>
-        </div>
-      </section>
-
-      <!-- SCREEN 3: ARTIST & PROJECT -->
-      <section id="screen-artist-project" class="screen">
-        <div class="logo">HTORINO</div>
-        <h1 id="artist-project-title">Artist & Project</h1>
-
-        <form id="artist-project-form">
-          <div class="field">
-            <label id="label-artist-name" for="artistName">Artist name</label>
-            <input id="artistName" name="artistName" type="text" />
-          </div>
-
-          <div class="field">
-            <label id="label-project-name" for="projectName">Project name</label>
-            <input id="projectName" name="projectName" type="text" />
-          </div>
-
-          <div class="field">
-            <label id="label-city" for="city">City / base</label>
-            <input id="city" name="city" type="text" />
-          </div>
-
-          <div class="field">
-            <label id="label-email" for="email">Email</label>
-            <input id="email" name="email" type="email" />
-          </div>
-
-          <div class="field">
-            <label id="label-instagram" for="instagram">Instagram</label>
-            <input id="instagram" name="instagram" type="text" />
-          </div>
-
-          <div class="field">
-            <label id="label-project-type" for="projectType">Project type</label>
-            <select id="projectType" name="projectType">
-              <option value="" id="project-type-placeholder">Select project type</option>
-              <option value="solo" id="project-type-solo">Solo</option>
-              <option value="band" id="project-type-band">Band</option>
-              <option value="duo" id="project-type-duo">Duo</option>
-              <option value="collective" id="project-type-collective">Collective</option>
-              <option value="other" id="project-type-other">Other</option>
-            </select>
-          </div>
-
-          <div class="form-buttons">
-            <button type="button" class="secondary-button" id="back-button" onclick="goToWelcome()">Back</button>
-            <button type="submit" id="next-button">Next</button>
-          </div>
-        </form>
-      </section>
-
+  <header id="header">
+    <div class="progress-track">
+      <div class="progress-fill" id="progressFill"></div>
     </div>
+    <div class="step-info">
+      <div class="step-fraction" id="stepFraction"></div>
+      <div class="step-name" id="stepName"></div>
+    </div>
+  </header>
+
+  <div id="app">
+    <div id="langScreen">
+      <div class="welcome-content">
+        <h1 class="welcome-title">Choose Language</h1>
+        <div class="welcome-divider"></div>
+        <div class="lang-buttons">
+          <button class="btn btn-primary" id="langEn">English</button>
+          <button class="btn btn-primary" id="langPl">Polski</button>
+        </div>
+      </div>
+    </div>
+
+    <section class="step" data-step="0">
+      <div class="step-content welcome-content">
+        <img src="https://pfst.cf2.poecdn.net/base/image/6a42ad6091b946dc3ae44e13772ad3936c182c55f06159137e6d538251aea2d6?w=600&h=600" alt="Torino Logo" style="width:140px;height:auto;margin-bottom:24px;opacity:0;animation:fadeUp 0.7s var(--ease-out) 0.05s forwards;">
+        <div class="welcome-eyebrow">Pre-Session Questionnaire</div>
+        <h1 class="welcome-title">Songwriting<br>Camp Brief</h1>
+        <div class="welcome-divider"></div>
+        <p class="welcome-text">This brief helps our producers and songwriters understand the emotional, sonic and lyrical direction of the song you want to create.</p>
+        <div class="welcome-cta">
+          <button class="btn btn-primary" id="startBtn">Start Brief <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg></button>
+        </div>
+      </div>
+    </section>
+
+    <section class="step" data-step="1">
+      <div class="step-content">
+        <div class="form-step-label">Step 01</div>
+        <h2 class="form-step-title">Artist &amp; Project</h2>
+        <p class="form-step-desc">Tell us who you are and what this project is about.</p>
+
+        <div class="form-group">
+          <label for="artistName">Artist Name</label>
+          <input type="text" id="artistName" placeholder="e.g. Luna Nova">
+        </div>
+        <div class="form-group">
+          <label for="projectName">Project / Album Name</label>
+          <input type="text" id="projectName" placeholder="e.g. Midnight Frequencies">
+        </div>
+        <div class="form-group">
+          <label for="songTarget">Song Target</label>
+          <select id="songTarget">
+            <option value="" disabled selected>Choose a target</option>
+            <option value="Lead Single">Lead Single</option>
+            <option value="Focus Track">Focus Track</option>
+            <option value="Album Track">Album Track</option>
+            <option value="Exploration">Exploration</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="deadline">Deadline <span class="optional">(optional)</span></label>
+          <input type="date" id="deadline">
+        </div>
+      </div>
+      <div class="nav-buttons">
+        <button class="btn btn-secondary" id="nav1Back">Back</button>
+        <button class="btn btn-primary" id="nav1Next">Continue</button>
+      </div>
+    </section>
+
+    <section class="step" data-step="2">
+      <div class="step-content">
+        <div class="form-step-label">Step 02</div>
+        <h2 class="form-step-title">Emotion &amp; Vibe</h2>
+        <p class="form-step-desc">Describe the emotional landscape of this record.</p>
+
+        <div class="form-group">
+          <label for="listenerFeel">How should the listener feel after hearing this song?</label>
+          <textarea id="listenerFeel" placeholder="e.g. Like they just drove through a neon-lit city at 2am with the windows down..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>Three words describing the vibe</label>
+          <div class="inline-fields">
+            <input type="text" id="vibe1" placeholder="Word 1">
+            <input type="text" id="vibe2" placeholder="Word 2">
+            <input type="text" id="vibe3" placeholder="Word 3">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Emotion tags</label>
+          <div class="pill-group" id="emotionTags">
+            <div class="pill" data-value="Nostalgic">Nostalgic</div>
+            <div class="pill" data-value="Euphoric">Euphoric</div>
+            <div class="pill" data-value="Melancholic">Melancholic</div>
+            <div class="pill" data-value="Dark">Dark</div>
+            <div class="pill" data-value="Intimate">Intimate</div>
+            <div class="pill" data-value="Empowering">Empowering</div>
+            <div class="pill" data-value="Playful">Playful</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="notSoundLike">What should this song NOT sound like?</label>
+          <textarea id="notSoundLike" placeholder="e.g. Nothing too polished or overproduced — no generic pop formulas..."></textarea>
+        </div>
+      </div>
+      <div class="nav-buttons">
+        <button class="btn btn-secondary" id="nav2Back">Back</button>
+        <button class="btn btn-primary" id="nav2Next">Continue</button>
+      </div>
+    </section>
+
+    <section class="step" data-step="3">
+      <div class="step-content">
+        <div class="form-step-label">Step 03</div>
+        <h2 class="form-step-title">References</h2>
+        <p class="form-step-desc">Share songs that live in the sonic world of this project.</p>
+
+        <div class="form-group">
+          <label>Reference song links <span class="optional">(up to 5)</span></label>
+          <div class="ref-links-list" id="refLinksContainer">
+            <div class="ref-link-row">
+              <span class="ref-link-num">1</span>
+              <input type="url" class="ref-link" placeholder="https://open.spotify.com/track/...">
+            </div>
+            <div class="ref-link-row">
+              <span class="ref-link-num">2</span>
+              <input type="url" class="ref-link" placeholder="Paste link here">
+            </div>
+          </div>
+          <button class="add-ref-btn" id="addRefBtn" type="button">
+            <svg viewBox="0 0 16 16"><line x1="8" y1="3" x2="8" y2="13"/><line x1="3" y1="8" x2="13" y2="8"/></svg>
+            Add another
+          </button>
+        </div>
+
+        <div class="form-group">
+          <label for="whatYouLike">What do you like about these references?</label>
+          <textarea id="whatYouLike" placeholder="e.g. The spacious production, layered vocals, the way the bass sits..."></textarea>
+        </div>
+        <div class="form-group">
+          <label for="whatYouDontLike">What don't you like about these references?</label>
+          <textarea id="whatYouDontLike" placeholder="e.g. The vocal mix feels too dry, the drums are too programmed..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>Three songs you wish you wrote</label>
+          <div class="ref-links-list">
+            <div class="ref-link-row">
+              <span class="ref-link-num">1</span>
+              <input type="url" id="wish1" placeholder="https://...">
+            </div>
+            <div class="ref-link-row">
+              <span class="ref-link-num">2</span>
+              <input type="url" id="wish2" placeholder="https://...">
+            </div>
+            <div class="ref-link-row">
+              <span class="ref-link-num">3</span>
+              <input type="url" id="wish3" placeholder="https://...">
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="nav-buttons">
+        <button class="btn btn-secondary" id="nav3Back">Back</button>
+        <button class="btn btn-primary" id="nav3Next">Continue</button>
+      </div>
+    </section>
+
+    <section class="step" data-step="4">
+      <div class="step-content">
+        <div class="form-step-label">Step 04</div>
+        <h2 class="form-step-title">Sonic Direction</h2>
+        <p class="form-step-desc">Define the sonic character and energy of the track.</p>
+
+        <div class="form-group">
+          <label>Energy Level</label>
+          <div class="energy-selector" id="energySelector">
+            <div class="energy-option" data-value="Slow">Slow</div>
+            <div class="energy-option selected" data-value="Midtempo">Midtempo</div>
+            <div class="energy-option" data-value="Upbeat">Upbeat</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Production Style</label>
+          <div class="pill-group" id="prodStyle">
+            <div class="pill" data-value="Organic">Organic</div>
+            <div class="pill" data-value="Electronic">Electronic</div>
+            <div class="pill" data-value="Hybrid">Hybrid</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Instruments or textures you would like</label>
+          <div class="instrument-presets">
+            <div class="instrument-note">Instrument and texture labels are kept in English for universal studio communication.</div>
+            <div class="instrument-pills" id="instrumentPills">
+              <div class="instrument-pill" data-value="Piano">Piano</div>
+              <div class="instrument-pill" data-value="Guitar">Guitar</div>
+              <div class="instrument-pill" data-value="Synths">Synths</div>
+              <div class="instrument-pill" data-value="Bass">Bass</div>
+              <div class="instrument-pill" data-value="808">808</div>
+              <div class="instrument-pill" data-value="Drums">Drums</div>
+              <div class="instrument-pill" data-value="Strings">Strings</div>
+              <div class="instrument-pill" data-value="Brass">Brass</div>
+              <div class="instrument-pill" data-value="Pads">Pads</div>
+              <div class="instrument-pill" data-value="Rhodes">Rhodes</div>
+              <div class="instrument-pill" data-value="Organ">Organ</div>
+              <div class="instrument-pill" data-value="Vinyl Texture">Vinyl Texture</div>
+              <div class="instrument-pill" data-value="Tape Saturation">Tape Saturation</div>
+              <div class="instrument-pill" data-value="Percussion">Percussion</div>
+              <div class="instrument-pill" data-value="Vocals (Chops)">Vocals (Chops)</div>
+              <div class="instrument-pill" data-value="Flute">Flute</div>
+            </div>
+          </div>
+          <textarea id="instruments" placeholder="Additional instruments, textures or sound design notes..."></textarea>
+        </div>
+        <div class="form-group">
+          <label for="soundsAvoid">Sounds you want to avoid</label>
+          <textarea id="soundsAvoid" placeholder="e.g. No trap hi-hats, no auto-tune..."></textarea>
+        </div>
+      </div>
+      <div class="nav-buttons">
+        <button class="btn btn-secondary" id="nav4Back">Back</button>
+        <button class="btn btn-primary" id="nav4Next">Continue</button>
+      </div>
+    </section>
+
+    <section class="step" data-step="5">
+      <div class="step-content">
+        <div class="form-step-label">Step 05</div>
+        <h2 class="form-step-title">Lyrics &amp; Topline</h2>
+        <p class="form-step-desc">Guide the lyrical and melodic direction.</p>
+
+        <div class="form-group">
+          <label for="mainTheme">Main theme of the song</label>
+          <textarea id="mainTheme" placeholder="e.g. The tension between wanting freedom and being afraid of leaving..."></textarea>
+        </div>
+        <div class="form-group">
+          <label for="language">Language</label>
+          <select id="language">
+            <option value="" disabled selected>Select language</option>
+            <option value="English">English</option>
+            <option value="Polish">Polish</option>
+            <option value="Mixed">Mixed</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="perspective">Perspective</label>
+          <select id="perspective">
+            <option value="" disabled selected>Select perspective</option>
+            <option value="I (First Person)">I (First Person)</option>
+            <option value="You (Second Person)">You (Second Person)</option>
+            <option value="Storytelling (Third Person)">Storytelling (Third Person)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="titleIdeas">Title or phrase ideas</label>
+          <textarea id="titleIdeas" placeholder="e.g. 'Gravity of Us', 'Falling Forward', hooks or lyric fragments..."></textarea>
+        </div>
+      </div>
+      <div class="nav-buttons">
+        <button class="btn btn-secondary" id="nav5Back">Back</button>
+        <button class="btn btn-primary" id="nav5Next">Continue</button>
+      </div>
+    </section>
+
+    <section class="step" data-step="6">
+      <div class="step-content">
+        <div class="form-step-label">Step 06</div>
+        <h2 class="form-step-title">Extra Notes</h2>
+        <p class="form-step-desc">Anything else that could help shape this record.</p>
+
+        <div class="form-group">
+          <label for="additionalNotes">Additional notes</label>
+          <textarea id="additionalNotes" rows="5" placeholder="Any other context, inspiration, mood boards, visual references..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>Audio reference <span class="optional">(optional)</span></label>
+          <div class="upload-zone" id="uploadZone">
+            <input type="file" id="audioUpload" accept="audio/*">
+            <div class="upload-icon">
+              <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            </div>
+            <div class="upload-label">Drop a file or <strong>browse</strong></div>
+            <div class="upload-filename" id="uploadFilename"></div>
+          </div>
+        </div>
+      </div>
+      <div class="nav-buttons">
+        <button class="btn btn-secondary" id="nav6Back">Back</button>
+        <button class="btn btn-primary" id="nav6Next">Review Brief</button>
+      </div>
+    </section>
+
+    <section class="step" data-step="7">
+      <div class="step-content">
+        <div class="form-step-label">Step 07</div>
+        <h2 class="form-step-title">Review &amp; Submit</h2>
+        <p class="form-step-desc">Look over your brief before submitting.</p>
+        <div id="reviewContainer"></div>
+      </div>
+      <div class="nav-buttons">
+        <button class="btn btn-secondary" id="nav7Back">Back</button>
+        <button class="btn btn-primary" id="submitBtn">Submit Brief <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg></button>
+      </div>
+    </section>
+
+    <section class="step" data-step="8">
+      <div class="step-content confirm-content">
+        <div class="confirm-check">
+          <svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+        </div>
+        <h2 class="confirm-title">Brief Submitted</h2>
+        <p class="confirm-text">Your creative direction has been received. Our team will review it before the session begins.</p>
+        <div class="confirm-actions">
+          <button class="btn btn-primary" id="restartBtn">Start New Brief</button>
+        </div>
+      </div>
+    </section>
   </div>
 
   <script>
-    const state = {
-      language: null,
-      artistProject: {
-        artistName: '',
-        projectName: '',
-        city: '',
-        email: '',
-        instagram: '',
-        projectType: ''
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      document.documentElement.classList.add('dark');
+    }
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(event) {
+      if (event.matches) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
       }
-    };
-
-    const translations = {
-      en: {
-        welcomeTitle: 'Welcome',
-        welcomeText: 'This brief will help us understand your project and your needs.',
-        startButton: 'Start',
-        artistProjectTitle: 'Artist & Project',
-        artistName: 'Artist name',
-        projectName: 'Project name',
-        city: 'City / base',
-        email: 'Email',
-        instagram: 'Instagram',
-        projectType: 'Project type',
-        projectTypePlaceholder: 'Select project type',
-        solo: 'Solo',
-        band: 'Band',
-        duo: 'Duo',
-        collective: 'Collective',
-        other: 'Other',
-        back: 'Back',
-        next: 'Next'
-      },
-      pl: {
-        welcomeTitle: 'Witamy',
-        welcomeText: 'Ten brief pomoże nam zrozumieć Twój projekt i Twoje potrzeby.',
-        startButton: 'Start',
-        artistProjectTitle: 'Artysta i projekt',
-        artistName: 'Nazwa artysty',
-        projectName: 'Nazwa projektu',
-        city: 'Miasto / baza',
-        email: 'E-mail',
-        instagram: 'Instagram',
-        projectType: 'Typ projektu',
-        projectTypePlaceholder: 'Wybierz typ projektu',
-        solo: 'Solo',
-        band: 'Zespół',
-        duo: 'Duet',
-        collective: 'Kolektyw',
-        other: 'Inne',
-        back: 'Wstecz',
-        next: 'Dalej'
-      }
-    };
-
-    function showScreen(screenId) {
-      const screens = document.querySelectorAll('.screen');
-      screens.forEach((screen) => {
-        screen.classList.remove('active');
-      });
-
-      document.getElementById(screenId).classList.add('active');
-    }
-
-    function selectLanguage(lang) {
-      state.language = lang;
-      updateTexts();
-      showScreen('screen-welcome');
-    }
-
-    function goToArtistProject() {
-      updateTexts();
-      fillArtistProjectFields();
-      showScreen('screen-artist-project');
-    }
-
-    function goToWelcome() {
-      updateTexts();
-      showScreen('screen-welcome');
-    }
-
-    function updateTexts() {
-      if (!state.language) return;
-
-      const t = translations[state.language];
-
-      document.getElementById('welcome-title').textContent = t.welcomeTitle;
-      document.getElementById('welcome-text').textContent = t.welcomeText;
-      document.getElementById('welcome-start-button').textContent = t.startButton;
-
-      document.getElementById('artist-project-title').textContent = t.artistProjectTitle;
-      document.getElementById('label-artist-name').textContent = t.artistName;
-      document.getElementById('label-project-name').textContent = t.projectName;
-      document.getElementById('label-city').textContent = t.city;
-      document.getElementById('label-email').textContent = t.email;
-      document.getElementById('label-instagram').textContent = t.instagram;
-      document.getElementById('label-project-type').textContent = t.projectType;
-
-      document.getElementById('project-type-placeholder').textContent = t.projectTypePlaceholder;
-      document.getElementById('project-type-solo').textContent = t.solo;
-      document.getElementById('project-type-band').textContent = t.band;
-      document.getElementById('project-type-duo').textContent = t.duo;
-      document.getElementById('project-type-collective').textContent = t.collective;
-      document.getElementById('project-type-other').textContent = t.other;
-
-      document.getElementById('back-button').textContent = t.back;
-      document.getElementById('next-button').textContent = t.next;
-    }
-
-    function fillArtistProjectFields() {
-      document.getElementById('artistName').value = state.artistProject.artistName;
-      document.getElementById('projectName').value = state.artistProject.projectName;
-      document.getElementById('city').value = state.artistProject.city;
-      document.getElementById('email').value = state.artistProject.email;
-      document.getElementById('instagram').value = state.artistProject.instagram;
-      document.getElementById('projectType').value = state.artistProject.projectType;
-    }
-
-    document.getElementById('artist-project-form').addEventListener('submit', function (event) {
-      event.preventDefault();
-
-      state.artistProject.artistName = document.getElementById('artistName').value;
-      state.artistProject.projectName = document.getElementById('projectName').value;
-      state.artistProject.city = document.getElementById('city').value;
-      state.artistProject.email = document.getElementById('email').value;
-      state.artistProject.instagram = document.getElementById('instagram').value;
-      state.artistProject.projectType = document.getElementById('projectType').value;
-
-      console.log('Saved data:', state.artistProject);
-      alert(state.language === 'pl' ? 'Sekcja zapisana. Następna sekcja będzie w kolejnym kroku.' : 'Section saved. We will add the next section in the next step.');
     });
+
+    function escapeHtml(str) {
+      var div = document.createElement('div');
+      div.appendChild(document.createTextNode(str));
+      return div.innerHTML;
+    }
+
+    var App = {
+      currentStep: 0,
+      totalFormSteps: 7,
+      audioFileName: '',
+      lang: 'en',
+
+      stepNames: [
+        '',
+        'Artist & Project',
+        'Emotion & Vibe',
+        'References',
+        'Sonic Direction',
+        'Lyrics & Topline',
+        'Extra Notes',
+        'Review'
+      ],
+
+      stepNamesPl: [
+        '',
+        'Artysta i projekt',
+        'Emocja i klimat',
+        'Referencje',
+        'Kierunek brzmieniowy',
+        'Tekst i topline',
+        'Dodatkowe uwagi',
+        'Przegląd'
+      ],
+
+      init: function() {
+        this.bindLang();
+        this.bindNavigation();
+        this.bindPills();
+        this.bindEnergy();
+        this.bindRefs();
+        this.bindUpload();
+        this.bindInstrumentPills();
+      },
+
+      bindLang: function() {
+        var self = this;
+        document.getElementById('langEn').addEventListener('click', function() {
+          self.lang = 'en';
+          document.getElementById('langScreen').classList.add('hidden');
+          document.querySelector('[data-step="0"]').classList.add('active');
+        });
+        document.getElementById('langPl').addEventListener('click', function() {
+          self.lang = 'pl';
+          self.applyPolish();
+          document.getElementById('langScreen').classList.add('hidden');
+          document.querySelector('[data-step="0"]').classList.add('active');
+        });
+      },
+
+      applyPolish: function() {
+        var arrow = ' <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg>';
+
+        var s0 = document.querySelector('[data-step="0"]');
+        s0.querySelector('.welcome-eyebrow').textContent = 'Kwestionariusz przedsesyjny';
+        s0.querySelector('.welcome-text').textContent = 'Ten brief pomoże naszym producentom i autorom tekstów zrozumieć emocjonalny, soniczny i liryczny kierunek utworu, który chcesz stworzyć.';
+        document.getElementById('startBtn').innerHTML = 'Rozpocznij' + arrow;
+
+        var s1 = document.querySelector('[data-step="1"]');
+        s1.querySelector('.form-step-label').textContent = 'Krok 01';
+        s1.querySelector('.form-step-title').textContent = 'Artysta i projekt';
+        s1.querySelector('.form-step-desc').textContent = 'Opowiedz nam kim jesteś i o czym jest ten projekt.';
+        var l1 = s1.querySelectorAll('.form-group label');
+        l1[0].textContent = 'Nazwa artysty';
+        l1[1].textContent = 'Nazwa projektu / albumu';
+        l1[2].textContent = 'Cel utworu';
+        l1[3].innerHTML = 'Termin <span class="optional">(opcjonalne)</span>';
+        document.getElementById('artistName').placeholder = 'np. Luna Nova';
+        document.getElementById('projectName').placeholder = 'np. Midnight Frequencies';
+        var st = document.getElementById('songTarget');
+        st.options[0].textContent = 'Wybierz cel';
+        st.options[1].textContent = 'Główny singiel';
+        st.options[2].textContent = 'Utwór promujący';
+        st.options[3].textContent = 'Utwór albumowy';
+        st.options[4].textContent = 'Eksploracja';
+
+        var s2 = document.querySelector('[data-step="2"]');
+        s2.querySelector('.form-step-label').textContent = 'Krok 02';
+        s2.querySelector('.form-step-title').textContent = 'Emocja i klimat';
+        s2.querySelector('.form-step-desc').textContent = 'Opisz emocjonalny krajobraz tego nagrania.';
+        var l2 = s2.querySelectorAll('.form-group label');
+        l2[0].textContent = 'Jak powinien się czuć słuchacz po usłyszeniu tego utworu?';
+        l2[1].textContent = 'Trzy słowa opisujące klimat';
+        l2[2].textContent = 'Tagi emocji';
+        l2[3].textContent = 'Jak ten utwór NIE powinien brzmieć?';
+        document.getElementById('listenerFeel').placeholder = 'np. Jakby właśnie jechał przez neonowe miasto o 2 w nocy z opuszczonymi szybami...';
+        document.getElementById('vibe1').placeholder = 'Słowo 1';
+        document.getElementById('vibe2').placeholder = 'Słowo 2';
+        document.getElementById('vibe3').placeholder = 'Słowo 3';
+        document.getElementById('notSoundLike').placeholder = 'np. Nic zbyt wypolerowanego — bez generycznych formuł pop...';
+        var pills2 = s2.querySelectorAll('#emotionTags .pill');
+        var emotionPl = { Nostalgic: 'Nostalgiczny', Euphoric: 'Euforyczny', Melancholic: 'Melancholijny', Dark: 'Mroczny', Intimate: 'Intymny', Empowering: 'Wzmacniający', Playful: 'Zabawny' };
+        pills2.forEach(function(p) { var k = p.getAttribute('data-value'); if (emotionPl[k]) p.textContent = emotionPl[k]; });
+
+        var s3 = document.querySelector('[data-step="3"]');
+        s3.querySelector('.form-step-label').textContent = 'Krok 03';
+        s3.querySelector('.form-step-title').textContent = 'Referencje';
+        s3.querySelector('.form-step-desc').textContent = 'Podziel się utworami, które żyją w sonicznym świecie tego projektu.';
+        var l3 = s3.querySelectorAll('.form-group label');
+        l3[0].innerHTML = 'Linki do referencyjnych utworów <span class="optional">(do 5)</span>';
+        l3[1].textContent = 'Co ci się podoba w tych referencjach?';
+        l3[2].textContent = 'Czego nie lubisz w tych referencjach?';
+        l3[3].textContent = 'Trzy piosenki, które chciałbyś napisać';
+        document.getElementById('addRefBtn').lastChild.textContent = ' Dodaj kolejny';
+        document.getElementById('whatYouLike').placeholder = 'np. Przestrzenna produkcja, warstwowe wokale, sposób w jaki siedzi bas...';
+        document.getElementById('whatYouDontLike').placeholder = 'np. Miks wokalu jest zbyt suchy, perkusja jest zbyt zaprogramowana...';
+
+        var s4 = document.querySelector('[data-step="4"]');
+        s4.querySelector('.form-step-label').textContent = 'Krok 04';
+        s4.querySelector('.form-step-title').textContent = 'Kierunek brzmieniowy';
+        s4.querySelector('.form-step-desc').textContent = 'Zdefiniuj charakter brzmieniowy i energię utworu.';
+        var l4 = s4.querySelectorAll('.form-group label');
+        l4[0].textContent = 'Poziom energii';
+        l4[1].textContent = 'Styl produkcji';
+        l4[2].textContent = 'Instrumenty lub tekstury, które chcesz';
+        l4[3].textContent = 'Dźwięki, których chcesz uniknąć';
+        var eOpts = s4.querySelectorAll('.energy-option');
+        eOpts[0].textContent = 'Wolno';
+        eOpts[1].textContent = 'Średnie tempo';
+        eOpts[2].textContent = 'Szybko';
+        var prodPills = s4.querySelectorAll('#prodStyle .pill');
+        var prodPl = { Organic: 'Organiczny', Electronic: 'Elektroniczny', Hybrid: 'Hybrydowy' };
+        prodPills.forEach(function(p) { var k = p.getAttribute('data-value'); if (prodPl[k]) p.textContent = prodPl[k]; });
+        s4.querySelector('.instrument-note').textContent = 'Nazwy instrumentów i tekstur pozostają w języku angielskim dla uniwersalnej komunikacji studyjnej.';
+        document.getElementById('instruments').placeholder = 'Dodatkowe instrumenty, tekstury lub uwagi dotyczące sound designu...';
+        document.getElementById('soundsAvoid').placeholder = 'np. Bez trapowych hi-hatów, bez auto-tune...';
+
+        var s5 = document.querySelector('[data-step="5"]');
+        s5.querySelector('.form-step-label').textContent = 'Krok 05';
+        s5.querySelector('.form-step-title').textContent = 'Tekst i topline';
+        s5.querySelector('.form-step-desc').textContent = 'Wyznacz kierunek liryczny i melodyczny.';
+        var l5 = s5.querySelectorAll('.form-group label');
+        l5[0].textContent = 'Główny temat utworu';
+        l5[1].textContent = 'Język';
+        l5[2].textContent = 'Perspektywa';
+        l5[3].textContent = 'Pomysły na tytuł lub frazę';
+        document.getElementById('mainTheme').placeholder = 'np. Napięcie między pragnieniem wolności a lękiem przed odejściem...';
+        var lang = document.getElementById('language');
+        lang.options[0].textContent = 'Wybierz język';
+        lang.options[1].textContent = 'Angielski';
+        lang.options[2].textContent = 'Polski';
+        lang.options[3].textContent = 'Mieszany';
+        var persp = document.getElementById('perspective');
+        persp.options[0].textContent = 'Wybierz perspektywę';
+        persp.options[1].textContent = 'Ja (pierwsza osoba)';
+        persp.options[2].textContent = 'Ty (druga osoba)';
+        persp.options[3].textContent = 'Narracja (trzecia osoba)';
+        document.getElementById('titleIdeas').placeholder = "np. 'Grawitacja nas', 'Padając do przodu', hooki lub fragmenty tekstu...";
+
+        var s6 = document.querySelector('[data-step="6"]');
+        s6.querySelector('.form-step-label').textContent = 'Krok 06';
+        s6.querySelector('.form-step-title').textContent = 'Dodatkowe uwagi';
+        s6.querySelector('.form-step-desc').textContent = 'Cokolwiek innego, co mogłoby pomóc ukształtować to nagranie.';
+        var l6 = s6.querySelectorAll('.form-group label');
+        l6[0].textContent = 'Dodatkowe uwagi';
+        l6[1].innerHTML = 'Referencja audio <span class="optional">(opcjonalne)</span>';
+        document.getElementById('additionalNotes').placeholder = 'Dodatkowy kontekst, inspiracje, moodboardy, wizualne referencje...';
+        s6.querySelector('.upload-label').innerHTML = 'Upuść plik lub <strong>przeglądaj</strong>';
+
+        var s7 = document.querySelector('[data-step="7"]');
+        s7.querySelector('.form-step-label').textContent = 'Krok 07';
+        s7.querySelector('.form-step-title').textContent = 'Przegląd i wysłanie';
+        s7.querySelector('.form-step-desc').textContent = 'Przejrzyj swój brief przed wysłaniem.';
+
+        var s8 = document.querySelector('[data-step="8"]');
+        s8.querySelector('.confirm-title').textContent = 'Brief wysłany';
+        s8.querySelector('.confirm-text').textContent = 'Twój kierunek kreatywny został odebrany. Nasz zespół zapozna się z nim przed rozpoczęciem sesji.';
+        document.getElementById('restartBtn').textContent = 'Nowy brief';
+
+        ['nav1Back','nav2Back','nav3Back','nav4Back','nav5Back','nav6Back','nav7Back'].forEach(function(id) {
+          document.getElementById(id).textContent = 'Wstecz';
+        });
+        ['nav1Next','nav2Next','nav3Next','nav4Next','nav5Next'].forEach(function(id) {
+          document.getElementById(id).textContent = 'Dalej';
+        });
+        document.getElementById('nav6Next').textContent = 'Przejrzyj brief';
+        document.getElementById('submitBtn').innerHTML = 'Wyślij brief' + arrow;
+      },
+
+      bindNavigation: function() {
+        var self = this;
+        document.getElementById('startBtn').addEventListener('click', function() { self.goTo(1); });
+        document.getElementById('nav1Back').addEventListener('click', function() { self.goTo(0); });
+        document.getElementById('nav1Next').addEventListener('click', function() { self.goTo(2); });
+        document.getElementById('nav2Back').addEventListener('click', function() { self.goTo(1); });
+        document.getElementById('nav2Next').addEventListener('click', function() { self.goTo(3); });
+        document.getElementById('nav3Back').addEventListener('click', function() { self.goTo(2); });
+        document.getElementById('nav3Next').addEventListener('click', function() { self.goTo(4); });
+        document.getElementById('nav4Back').addEventListener('click', function() { self.goTo(3); });
+        document.getElementById('nav4Next').addEventListener('click', function() { self.goTo(5); });
+        document.getElementById('nav5Back').addEventListener('click', function() { self.goTo(4); });
+        document.getElementById('nav5Next').addEventListener('click', function() { self.goTo(6); });
+        document.getElementById('nav6Back').addEventListener('click', function() { self.goTo(5); });
+        document.getElementById('nav6Next').addEventListener('click', function() { self.goTo(7); });
+        document.getElementById('nav7Back').addEventListener('click', function() { self.goTo(6); });
+        document.getElementById('submitBtn').addEventListener('click', function() { self.goTo(8); });
+        document.getElementById('restartBtn').addEventListener('click', function() { self.resetForm(); });
+      },
+
+      bindPills: function() {
+        document.querySelectorAll('.pill-group .pill').forEach(function(pill) {
+          pill.addEventListener('click', function() {
+            this.classList.toggle('selected');
+          });
+        });
+      },
+
+      bindInstrumentPills: function() {
+        document.querySelectorAll('#instrumentPills .instrument-pill').forEach(function(pill) {
+          pill.addEventListener('click', function() {
+            this.classList.toggle('selected');
+          });
+        });
+      },
+
+      bindEnergy: function() {
+        var opts = document.querySelectorAll('#energySelector .energy-option');
+        opts.forEach(function(opt) {
+          opt.addEventListener('click', function() {
+            opts.forEach(function(o) { o.classList.remove('selected'); });
+            this.classList.add('selected');
+          });
+        });
+      },
+
+      bindRefs: function() {
+        document.getElementById('addRefBtn').addEventListener('click', function() {
+          var container = document.getElementById('refLinksContainer');
+          var count = container.querySelectorAll('.ref-link-row').length;
+          if (count >= 5) return;
+          var row = document.createElement('div');
+          row.className = 'ref-link-row';
+          row.innerHTML = '<span class="ref-link-num">' + (count + 1) + '</span><input type="url" class="ref-link" placeholder="Paste link here">';
+          container.appendChild(row);
+          if (count + 1 >= 5) {
+            document.getElementById('addRefBtn').style.display = 'none';
+          }
+        });
+      },
+
+      bindUpload: function() {
+        var self = this;
+        document.getElementById('audioUpload').addEventListener('change', function(e) {
+          var file = e.target.files[0];
+          var zone = document.getElementById('uploadZone');
+          var nameEl = document.getElementById('uploadFilename');
+          if (file) {
+            self.audioFileName = file.name;
+            nameEl.textContent = file.name;
+            zone.classList.add('has-file');
+          } else {
+            self.audioFileName = '';
+            nameEl.textContent = '';
+            zone.classList.remove('has-file');
+          }
+        });
+      },
+
+      goTo: function(step) {
+        if (step === 7) this.buildReview();
+
+        var current = document.querySelector('.step.active');
+        var target = document.querySelector('.step[data-step="' + step + '"]');
+
+        if (!current) {
+          target.classList.add('active');
+          this.currentStep = step;
+          this.updateProgress();
+          return;
+        }
+
+        if (!target || current === target) return;
+
+        var self = this;
+        current.classList.remove('active');
+        current.classList.add('exiting');
+
+        setTimeout(function() {
+          current.classList.remove('exiting');
+          target.classList.add('active');
+          self.currentStep = step;
+          self.updateProgress();
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }, 300);
+      },
+
+      updateProgress: function() {
+        var header = document.getElementById('header');
+        var fill = document.getElementById('progressFill');
+        var fraction = document.getElementById('stepFraction');
+        var name = document.getElementById('stepName');
+
+        if (this.currentStep === 0 || this.currentStep === 8) {
+          header.classList.remove('visible');
+        } else {
+          header.classList.add('visible');
+          var pct = (this.currentStep / this.totalFormSteps) * 100;
+          fill.style.width = pct + '%';
+          fraction.innerHTML = '<span>0' + this.currentStep + '</span> / 07';
+          var names = this.lang === 'pl' ? this.stepNamesPl : this.stepNames;
+          name.textContent = names[this.currentStep] || '';
+        }
+      },
+
+      getVal: function(id) {
+        var el = document.getElementById(id);
+        if (!el) return '';
+        return (el.value || '').trim();
+      },
+
+      getSelectedPills: function(containerId) {
+        var pills = document.querySelectorAll('#' + containerId + ' .pill.selected');
+        var vals = [];
+        pills.forEach(function(p) { vals.push(p.getAttribute('data-value')); });
+        return vals;
+      },
+
+      getSelectedInstruments: function() {
+        var pills = document.querySelectorAll('#instrumentPills .instrument-pill.selected');
+        var vals = [];
+        pills.forEach(function(p) { vals.push(p.getAttribute('data-value')); });
+        return vals;
+      },
+
+      getEnergy: function() {
+        var sel = document.querySelector('#energySelector .energy-option.selected');
+        return sel ? sel.getAttribute('data-value') : '';
+      },
+
+      getRefLinks: function() {
+        var links = [];
+        document.querySelectorAll('#refLinksContainer .ref-link').forEach(function(input) {
+          var v = input.value.trim();
+          if (v) links.push(v);
+        });
+        return links;
+      },
+
+      buildReview: function() {
+        var container = document.getElementById('reviewContainer');
+        var self = this;
+
+        var emotionTags = this.getSelectedPills('emotionTags');
+        var prodStyles = this.getSelectedPills('prodStyle');
+        var selectedInstruments = this.getSelectedInstruments();
+        var refLinks = this.getRefLinks();
+        var wishLinks = [this.getVal('wish1'), this.getVal('wish2'), this.getVal('wish3')].filter(function(v) { return v; });
+        var vibeWords = [this.getVal('vibe1'), this.getVal('vibe2'), this.getVal('vibe3')].filter(function(v) { return v; });
+
+        var instrumentText = this.getVal('instruments');
+
+        var pl = this.lang === 'pl' ? {
+          'Artist & Project': 'Artysta i projekt', 'Artist Name': 'Nazwa artysty', 'Project / Album': 'Projekt / Album', 'Song Target': 'Cel utworu', 'Deadline': 'Termin',
+          'Emotion & Vibe': 'Emocja i klimat', 'Listener Feel': 'Odczucia słuchacza', 'Vibe Words': 'Słowa klimatu', 'Emotion Tags': 'Tagi emocji', 'Should NOT Sound Like': 'NIE powinien brzmieć jak',
+          'References': 'Referencje', 'Reference Links': 'Linki referencyjne', 'What You Like': 'Co ci się podoba', "What You Don't Like": 'Czego nie lubisz', 'Songs You Wish You Wrote': 'Piosenki, które chciałbyś napisać',
+          'Sonic Direction': 'Kierunek brzmieniowy', 'Energy Level': 'Poziom energii', 'Production Style': 'Styl produkcji', 'Instruments & Textures': 'Instrumenty i tekstury', 'Sounds to Avoid': 'Dźwięki do unikania',
+          'Lyrics & Topline': 'Tekst i topline', 'Main Theme': 'Główny temat', 'Language': 'Język', 'Perspective': 'Perspektywa', 'Title / Phrase Ideas': 'Pomysły na tytuł / frazę',
+          'Extra Notes': 'Dodatkowe uwagi', 'Additional Notes': 'Dodatkowe uwagi', 'Audio Reference': 'Referencja audio', 'Not specified': 'Nie określono'
+        } : {};
+        function tr(k) { return pl[k] || k; }
+
+        var sections = [
+          {
+            title: tr('Artist & Project'),
+            step: 1,
+            rows: [
+              { label: tr('Artist Name'), value: this.getVal('artistName') },
+              { label: tr('Project / Album'), value: this.getVal('projectName') },
+              { label: tr('Song Target'), value: this.getVal('songTarget') },
+              { label: tr('Deadline'), value: this.getVal('deadline') }
+            ]
+          },
+          {
+            title: tr('Emotion & Vibe'),
+            step: 2,
+            rows: [
+              { label: tr('Listener Feel'), value: this.getVal('listenerFeel') },
+              { label: tr('Vibe Words'), pills: vibeWords },
+              { label: tr('Emotion Tags'), pills: emotionTags },
+              { label: tr('Should NOT Sound Like'), value: this.getVal('notSoundLike') }
+            ]
+          },
+          {
+            title: tr('References'),
+            step: 3,
+            rows: [
+              { label: tr('Reference Links'), list: refLinks },
+              { label: tr('What You Like'), value: this.getVal('whatYouLike') },
+              { label: tr("What You Don't Like"), value: this.getVal('whatYouDontLike') },
+              { label: tr('Songs You Wish You Wrote'), list: wishLinks }
+            ]
+          },
+          {
+            title: tr('Sonic Direction'),
+            step: 4,
+            rows: [
+              { label: tr('Energy Level'), value: this.getEnergy() },
+              { label: tr('Production Style'), pills: prodStyles },
+              { label: tr('Instruments & Textures'), pills: selectedInstruments.length > 0 ? selectedInstruments : null, value: instrumentText },
+              { label: tr('Sounds to Avoid'), value: this.getVal('soundsAvoid') }
+            ]
+          },
+          {
+            title: tr('Lyrics & Topline'),
+            step: 5,
+            rows: [
+              { label: tr('Main Theme'), value: this.getVal('mainTheme') },
+              { label: tr('Language'), value: this.getVal('language') },
+              { label: tr('Perspective'), value: this.getVal('perspective') },
+              { label: tr('Title / Phrase Ideas'), value: this.getVal('titleIdeas') }
+            ]
+          },
+          {
+            title: tr('Extra Notes'),
+            step: 6,
+            rows: [
+              { label: tr('Additional Notes'), value: this.getVal('additionalNotes') },
+              { label: tr('Audio Reference'), value: this.audioFileName }
+            ]
+          }
+        ];
+
+        var html = '';
+        sections.forEach(function(section) {
+          html += '<div class="review-section">';
+          html += '<div class="review-section-header">';
+          html += '<div class="review-section-title">' + escapeHtml(section.title) + '</div>';
+          html += '<button class="review-edit-btn" data-goto="' + section.step + '">' + (self.lang === 'pl' ? 'Edytuj' : 'Edit') + '</button>';
+          html += '</div>';
+
+          section.rows.forEach(function(row) {
+            html += '<div class="review-row">';
+            html += '<div class="review-label">' + escapeHtml(row.label) + '</div>';
+
+            if (row.pills && row.pills.length > 0) {
+              html += '<div class="review-pills">';
+              row.pills.forEach(function(p) {
+                html += '<span class="review-pill">' + escapeHtml(p) + '</span>';
+              });
+              html += '</div>';
+              if (row.value) {
+                html += '<div class="review-value" style="margin-top:6px">' + escapeHtml(row.value) + '</div>';
+              }
+            } else if (row.list) {
+              if (row.list.length > 0) {
+                row.list.forEach(function(item) {
+                  html += '<div class="review-value">' + escapeHtml(item) + '</div>';
+                });
+              } else {
+                html += '<div class="review-value empty">' + tr('Not specified') + '</div>';
+              }
+            } else {
+              var displayVal = row.value || tr('Not specified');
+              var cls = row.value ? '' : ' empty';
+              html += '<div class="review-value' + cls + '">' + escapeHtml(displayVal) + '</div>';
+            }
+
+            html += '</div>';
+          });
+
+          html += '</div>';
+        });
+
+        container.innerHTML = html;
+
+        container.querySelectorAll('.review-edit-btn').forEach(function(btn) {
+          btn.addEventListener('click', function() {
+            var targetStep = parseInt(this.getAttribute('data-goto'), 10);
+            self.goTo(targetStep);
+          });
+        });
+      },
+
+      resetForm: function() {
+        document.querySelectorAll('input[type="text"], input[type="url"], input[type="date"], textarea').forEach(function(el) {
+          el.value = '';
+        });
+        document.querySelectorAll('select').forEach(function(el) {
+          el.selectedIndex = 0;
+        });
+        document.querySelectorAll('.pill.selected').forEach(function(p) {
+          p.classList.remove('selected');
+        });
+        document.querySelectorAll('.instrument-pill.selected').forEach(function(p) {
+          p.classList.remove('selected');
+        });
+        var energyOpts = document.querySelectorAll('#energySelector .energy-option');
+        energyOpts.forEach(function(o) { o.classList.remove('selected'); });
+        energyOpts[1].classList.add('selected');
+        document.getElementById('uploadZone').classList.remove('has-file');
+        document.getElementById('uploadFilename').textContent = '';
+        document.getElementById('audioUpload').value = '';
+        this.audioFileName = '';
+
+        var container = document.getElementById('refLinksContainer');
+        container.innerHTML =
+          '<div class="ref-link-row"><span class="ref-link-num">1</span><input type="url" class="ref-link" placeholder="https://open.spotify.com/track/..."></div>' +
+          '<div class="ref-link-row"><span class="ref-link-num">2</span><input type="url" class="ref-link" placeholder="Paste link here"></div>';
+        document.getElementById('addRefBtn').style.display = '';
+
+        window.location.reload();
+      }
+    };
+
+    App.init();
   </script>
 </body>
 </html>
