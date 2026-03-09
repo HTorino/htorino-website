@@ -1164,7 +1164,26 @@
         document.getElementById('nav6Back').addEventListener('click', function() { self.goTo(5); });
         document.getElementById('nav6Next').addEventListener('click', function() { self.goTo(7); });
         document.getElementById('nav7Back').addEventListener('click', function() { self.goTo(6); });
-        document.getElementById('submitBtn').addEventListener('click', function() { self.goTo(8); });
+        document.getElementById('submitBtn').addEventListener('click', async function() {
+  var btn = this;
+  var originalHtml = btn.innerHTML;
+
+  try {
+    btn.disabled = true;
+    btn.innerHTML = self.lang === 'pl' ? 'Wysyłanie...' : 'Sending...';
+
+    await self.submitToMake();
+    self.goTo(8);
+  } catch (error) {
+    console.error(error);
+    alert(self.lang === 'pl'
+      ? 'Nie udało się wysłać briefu do Make.'
+      : 'Could not send the brief to Make.');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = originalHtml;
+  }
+});
         document.getElementById('restartBtn').addEventListener('click', function() { self.resetForm(); });
       },
 
