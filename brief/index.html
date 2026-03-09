@@ -5,80 +5,366 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>HTorino Brief</title>
   <style>
-    * { box-sizing: border-box; }
-    body {
+    * {
+      box-sizing: border-box;
       margin: 0;
-      min-height: 100vh;
-      background: #0E0E0E;
-      color: #FFFFFF;
+      padding: 0;
+    }
+
+    body {
+      background: #000;
+      color: #fff;
       font-family: Arial, sans-serif;
+      min-height: 100vh;
+    }
+
+    .page {
+      min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 24px;
+      padding: 32px 20px;
     }
-    .card {
+
+    .container {
       width: 100%;
       max-width: 720px;
-      background: #151515;
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 20px;
-      padding: 40px 28px;
       text-align: center;
     }
-    .logo {
-      width: 120px;
-      max-width: 100%;
-      margin-bottom: 24px;
+
+    .screen {
+      display: none;
     }
+
+    .screen.active {
+      display: block;
+    }
+
     h1 {
-      margin: 0 0 12px;
-      font-size: 32px;
-      font-weight: 400;
+      font-size: 36px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      letter-spacing: 0.02em;
     }
+
     p {
-      margin: 0 auto 28px;
-      max-width: 560px;
-      color: rgba(255,255,255,0.78);
-      line-height: 1.6;
       font-size: 16px;
+      line-height: 1.6;
+      color: #cfcfcf;
+      margin-bottom: 32px;
     }
+
     .buttons {
       display: flex;
-      gap: 12px;
+      gap: 16px;
       justify-content: center;
       flex-wrap: wrap;
-      margin-bottom: 20px;
+      margin-top: 24px;
     }
+
     button {
-      background: #C9A96E;
-      color: #0E0E0E;
+      background: #fff;
+      color: #000;
       border: none;
-      border-radius: 999px;
-      padding: 14px 22px;
+      padding: 14px 24px;
       font-size: 15px;
       cursor: pointer;
-      font-weight: 600;
+      min-width: 160px;
+      transition: 0.2s ease;
     }
-    .note {
+
+    button:hover {
+      opacity: 0.85;
+    }
+
+    .secondary-button {
+      background: transparent;
+      color: #fff;
+      border: 1px solid #666;
+    }
+
+    form {
+      text-align: left;
+      margin-top: 32px;
+    }
+
+    .field {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
       font-size: 14px;
-      color: rgba(255,255,255,0.58);
+      color: #ddd;
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: 14px 16px;
+      background: #111;
+      color: #fff;
+      border: 1px solid #333;
+      font-size: 15px;
+      outline: none;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: #888;
+    }
+
+    .form-buttons {
+      display: flex;
+      gap: 16px;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      margin-top: 32px;
+    }
+
+    .form-buttons button {
+      flex: 1;
+      min-width: 180px;
+    }
+
+    .logo {
+      font-size: 14px;
+      letter-spacing: 0.25em;
+      color: #888;
+      margin-bottom: 28px;
+    }
+
+    @media (max-width: 640px) {
+      h1 {
+        font-size: 28px;
+      }
+
+      .buttons,
+      .form-buttons {
+        flex-direction: column;
+      }
+
+      button {
+        width: 100%;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="card">
-    <img src="/logo.png" alt="HTorino" class="logo" />
-    <h1>Songwriting Brief Portal</h1>
-    <p>
-      This is the first production version of our artist brief portal.
-      The full multi-step form will be added here next.
-    </p>
-    <div class="buttons">
-      <button>English</button>
-      <button>Polski</button>
+  <div class="page">
+    <div class="container">
+
+      <!-- SCREEN 1: LANGUAGE -->
+      <section id="screen-language" class="screen active">
+        <div class="logo">HTORINO</div>
+        <h1>Choose Language</h1>
+        <p>Wybierz język formularza.</p>
+
+        <div class="buttons">
+          <button type="button" onclick="selectLanguage('en')">English</button>
+          <button type="button" onclick="selectLanguage('pl')">Polski</button>
+        </div>
+      </section>
+
+      <!-- SCREEN 2: WELCOME -->
+      <section id="screen-welcome" class="screen">
+        <div class="logo">HTORINO</div>
+        <h1 id="welcome-title">Welcome</h1>
+        <p id="welcome-text">
+          This brief will help us understand your project and your needs.
+        </p>
+
+        <div class="buttons">
+          <button type="button" id="welcome-start-button" onclick="goToArtistProject()">Start</button>
+        </div>
+      </section>
+
+      <!-- SCREEN 3: ARTIST & PROJECT -->
+      <section id="screen-artist-project" class="screen">
+        <div class="logo">HTORINO</div>
+        <h1 id="artist-project-title">Artist & Project</h1>
+
+        <form id="artist-project-form">
+          <div class="field">
+            <label id="label-artist-name" for="artistName">Artist name</label>
+            <input id="artistName" name="artistName" type="text" />
+          </div>
+
+          <div class="field">
+            <label id="label-project-name" for="projectName">Project name</label>
+            <input id="projectName" name="projectName" type="text" />
+          </div>
+
+          <div class="field">
+            <label id="label-city" for="city">City / base</label>
+            <input id="city" name="city" type="text" />
+          </div>
+
+          <div class="field">
+            <label id="label-email" for="email">Email</label>
+            <input id="email" name="email" type="email" />
+          </div>
+
+          <div class="field">
+            <label id="label-instagram" for="instagram">Instagram</label>
+            <input id="instagram" name="instagram" type="text" />
+          </div>
+
+          <div class="field">
+            <label id="label-project-type" for="projectType">Project type</label>
+            <select id="projectType" name="projectType">
+              <option value="" id="project-type-placeholder">Select project type</option>
+              <option value="solo" id="project-type-solo">Solo</option>
+              <option value="band" id="project-type-band">Band</option>
+              <option value="duo" id="project-type-duo">Duo</option>
+              <option value="collective" id="project-type-collective">Collective</option>
+              <option value="other" id="project-type-other">Other</option>
+            </select>
+          </div>
+
+          <div class="form-buttons">
+            <button type="button" class="secondary-button" id="back-button" onclick="goToWelcome()">Back</button>
+            <button type="submit" id="next-button">Next</button>
+          </div>
+        </form>
+      </section>
+
     </div>
-    <div class="note">Next step: replacing this with the full native brief form.</div>
   </div>
+
+  <script>
+    const state = {
+      language: null,
+      artistProject: {
+        artistName: '',
+        projectName: '',
+        city: '',
+        email: '',
+        instagram: '',
+        projectType: ''
+      }
+    };
+
+    const translations = {
+      en: {
+        welcomeTitle: 'Welcome',
+        welcomeText: 'This brief will help us understand your project and your needs.',
+        startButton: 'Start',
+        artistProjectTitle: 'Artist & Project',
+        artistName: 'Artist name',
+        projectName: 'Project name',
+        city: 'City / base',
+        email: 'Email',
+        instagram: 'Instagram',
+        projectType: 'Project type',
+        projectTypePlaceholder: 'Select project type',
+        solo: 'Solo',
+        band: 'Band',
+        duo: 'Duo',
+        collective: 'Collective',
+        other: 'Other',
+        back: 'Back',
+        next: 'Next'
+      },
+      pl: {
+        welcomeTitle: 'Witamy',
+        welcomeText: 'Ten brief pomoże nam zrozumieć Twój projekt i Twoje potrzeby.',
+        startButton: 'Start',
+        artistProjectTitle: 'Artysta i projekt',
+        artistName: 'Nazwa artysty',
+        projectName: 'Nazwa projektu',
+        city: 'Miasto / baza',
+        email: 'E-mail',
+        instagram: 'Instagram',
+        projectType: 'Typ projektu',
+        projectTypePlaceholder: 'Wybierz typ projektu',
+        solo: 'Solo',
+        band: 'Zespół',
+        duo: 'Duet',
+        collective: 'Kolektyw',
+        other: 'Inne',
+        back: 'Wstecz',
+        next: 'Dalej'
+      }
+    };
+
+    function showScreen(screenId) {
+      const screens = document.querySelectorAll('.screen');
+      screens.forEach((screen) => {
+        screen.classList.remove('active');
+      });
+
+      document.getElementById(screenId).classList.add('active');
+    }
+
+    function selectLanguage(lang) {
+      state.language = lang;
+      updateTexts();
+      showScreen('screen-welcome');
+    }
+
+    function goToArtistProject() {
+      updateTexts();
+      fillArtistProjectFields();
+      showScreen('screen-artist-project');
+    }
+
+    function goToWelcome() {
+      updateTexts();
+      showScreen('screen-welcome');
+    }
+
+    function updateTexts() {
+      if (!state.language) return;
+
+      const t = translations[state.language];
+
+      document.getElementById('welcome-title').textContent = t.welcomeTitle;
+      document.getElementById('welcome-text').textContent = t.welcomeText;
+      document.getElementById('welcome-start-button').textContent = t.startButton;
+
+      document.getElementById('artist-project-title').textContent = t.artistProjectTitle;
+      document.getElementById('label-artist-name').textContent = t.artistName;
+      document.getElementById('label-project-name').textContent = t.projectName;
+      document.getElementById('label-city').textContent = t.city;
+      document.getElementById('label-email').textContent = t.email;
+      document.getElementById('label-instagram').textContent = t.instagram;
+      document.getElementById('label-project-type').textContent = t.projectType;
+
+      document.getElementById('project-type-placeholder').textContent = t.projectTypePlaceholder;
+      document.getElementById('project-type-solo').textContent = t.solo;
+      document.getElementById('project-type-band').textContent = t.band;
+      document.getElementById('project-type-duo').textContent = t.duo;
+      document.getElementById('project-type-collective').textContent = t.collective;
+      document.getElementById('project-type-other').textContent = t.other;
+
+      document.getElementById('back-button').textContent = t.back;
+      document.getElementById('next-button').textContent = t.next;
+    }
+
+    function fillArtistProjectFields() {
+      document.getElementById('artistName').value = state.artistProject.artistName;
+      document.getElementById('projectName').value = state.artistProject.projectName;
+      document.getElementById('city').value = state.artistProject.city;
+      document.getElementById('email').value = state.artistProject.email;
+      document.getElementById('instagram').value = state.artistProject.instagram;
+      document.getElementById('projectType').value = state.artistProject.projectType;
+    }
+
+    document.getElementById('artist-project-form').addEventListener('submit', function (event) {
+      event.preventDefault();
+
+      state.artistProject.artistName = document.getElementById('artistName').value;
+      state.artistProject.projectName = document.getElementById('projectName').value;
+      state.artistProject.city = document.getElementById('city').value;
+      state.artistProject.email = document.getElementById('email').value;
+      state.artistProject.instagram = document.getElementById('instagram').value;
+      state.artistProject.projectType = document.getElementById('projectType').value;
+
+      console.log('Saved data:', state.artistProject);
+      alert(state.language === 'pl' ? 'Sekcja zapisana. Następna sekcja będzie w kolejnym kroku.' : 'Section saved. We will add the next section in the next step.');
+    });
+  </script>
 </body>
 </html>
