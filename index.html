@@ -3,10 +3,10 @@
 
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>HTorino</title>
 
 <style>
-
 body{
 margin:0;
 height:100vh;
@@ -18,13 +18,9 @@ background:#0E0E0E;
 font-family:sans-serif;
 }
 
-/* logo */
-
 .logo{
 width:200px;
 }
-
-/* social icons container */
 
 .socials{
 margin-top:18px;
@@ -32,21 +28,32 @@ display:flex;
 gap:12px;
 }
 
-/* social icons */
-
 .socials img{
 width:22px;
 opacity:0.9;
 transition:opacity 0.2s ease, transform 0.2s ease;
 }
 
-/* hover */
-
 .socials img:hover{
 opacity:1;
 transform:scale(1.08);
 }
 
+/* mobile only */
+@media (max-width: 768px){
+.logo{
+width:280px;
+}
+
+.socials{
+margin-top:24px;
+gap:16px;
+}
+
+.socials img{
+width:28px;
+}
+}
 </style>
 
 </head>
@@ -56,15 +63,13 @@ transform:scale(1.08);
 <img src="logo.png" class="logo" alt="HTorino">
 
 <div class="socials">
-
-<a href="https://open.spotify.com/playlist/5209QTHpYltiKwKntXbq2B?si=4477fa7bc3144442" target="_blank">
+<a href="https://open.spotify.com/playlist/5209QTHpYltiKwKntXbq2B?si=4477fa7bc3144442" target="_blank" rel="noopener noreferrer">
 <img src="spotify-official.png" alt="Spotify">
 </a>
 
-<a href="https://www.instagram.com/hotel_torino" target="_blank">
+<a href="https://www.instagram.com/hotel_torino" target="_blank" rel="noopener noreferrer">
 <img src="instagram-official.png" alt="Instagram">
 </a>
-
 </div>
 
 </body>
