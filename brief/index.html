@@ -1492,45 +1492,46 @@
       },
 
       buildPayload: function() {
-        return {
-          artist_name: this.getVal('artistName'),
-          project_name: this.getVal('projectName'),
-          song_target: this.getVal('songTarget'),
+  return {
+    artist_name: this.getVal('artistName'),
+    project_name: this.getVal('projectName'),
+    song_target: this.getVal('songTarget'),
+    deadline: this.getVal('deadline'),
 
-          emotion_description: this.getVal('listenerFeel'),
-          emotion_tags: this.getSelectedPills('emotionTags'),
+    emotion_description: this.getVal('listenerFeel'),
+    emotion_tags: this.getSelectedPills('emotionTags'),
 
-          vibe_words: [
-            this.getVal('vibe1'),
-            this.getVal('vibe2'),
-            this.getVal('vibe3')
-          ].filter(function(v) { return v; }),
+    vibe_words: [
+      this.getVal('vibe1'),
+      this.getVal('vibe2'),
+      this.getVal('vibe3')
+    ].filter(function(v) { return v; }),
 
-          avoid_direction: this.getVal('notSoundLike'),
+    avoid_direction: this.getVal('notSoundLike'),
 
-          references: this.getRefLinks(),
+    references: this.getRefLinks(),
 
-          energy_level: this.getEnergy(),
+    energy_level: this.getEnergy(),
 
-          production_style: this.getSelectedPills('prodStyle'),
+    production_style: this.getSelectedPills('prodStyle'),
 
-          instruments: this.getSelectedInstruments(),
+    instruments: this.getSelectedInstruments(),
 
-          avoid_sounds: this.getVal('soundsAvoid'),
+    avoid_sounds: this.getVal('soundsAvoid'),
 
-          lyrics_theme: this.getVal('mainTheme'),
-          language: this.getVal('language'),
-          perspective: this.getVal('perspective'),
-          title_ideas: this.getVal('titleIdeas'),
+    lyrics_theme: this.getVal('mainTheme'),
+    language: this.getVal('language'),
+    perspective: this.getVal('perspective'),
+    title_ideas: this.getVal('titleIdeas'),
 
-          extra_notes: this.getVal('additionalNotes'),
+    extra_notes: this.getVal('additionalNotes'),
 
-          meta: {
-            source: 'htorino-brief',
-            submitted_at: new Date().toISOString()
-          }
-        };
-      },
+    meta: {
+      source: 'htorino-brief',
+      submitted_at: new Date().toISOString()
+    }
+  };
+},
 
       submitToMake: async function() {
         var payload = this.buildPayload();
