@@ -2,105 +2,140 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HTorino</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HTorino</title>
 
-  <meta property="og:title" content="Hotel Torino">
-  <meta property="og:description" content="Hotel Torino">
-  <meta property="og:image" content="https://htorino.pl/preview.jpg">
-  <meta property="og:url" content="https://htorino.pl">
-  <meta property="og:type" content="website">
+<meta property="og:title" content="Hotel Torino">
+<meta property="og:description" content="Hotel Torino">
+<meta property="og:image" content="https://htorino.pl/preview.jpg">
+<meta property="og:url" content="https://htorino.pl">
+<meta property="og:type" content="website">
 
-  <link rel="icon" type="image/jpeg" href="https://htorino.pl/favicon.jpg">
-  <link rel="apple-touch-icon" href="https://htorino.pl/favicon.jpg">
+<link rel="icon" type="image/jpeg" href="https://htorino.pl/favicon.jpg">
+<link rel="apple-touch-icon" href="https://htorino.pl/favicon.jpg">
 
-  <style>
-    body{
-      margin:0;
-      height:100vh;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      flex-direction:column;
-      background:#0E0E0E;
-      font-family:sans-serif;
-    }
+<style>
 
-    .intro{
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      opacity:0;
-      transform:translateY(8px);
-      animation:introFade 700ms ease-out forwards;
-    }
+body{
+margin:0;
+height:100vh;
+display:flex;
+align-items:center;
+justify-content:center;
+background:#0E0E0E;
+font-family:sans-serif;
+overflow:hidden;
+}
 
-    .logo{
-      width:200px;
-    }
+/* main container */
 
-    .socials{
-      margin-top:18px;
-      display:flex;
-      gap:12px;
-    }
+.intro{
+position:relative;
+display:flex;
+flex-direction:column;
+align-items:center;
 
-    .socials img{
-      width:22px;
-      opacity:0.9;
-      transition:opacity 0.2s ease, transform 0.2s ease;
-    }
+opacity:0;
+transform:translateY(8px);
+animation:introFade 700ms ease-out forwards;
+}
 
-    .socials img:hover{
-      opacity:1;
-      transform:scale(1.08);
-    }
+/* ambient glow */
 
-    @keyframes introFade{
-      from{
-        opacity:0;
-        transform:translateY(8px);
-      }
-      to{
-        opacity:1;
-        transform:translateY(0);
-      }
-    }
+.intro::before{
+content:"";
+position:absolute;
 
-    /* mobile only */
-    @media (max-width: 768px){
-      .logo{
-        width:200px;
-      }
+width:420px;
+height:420px;
 
-      .socials{
-        margin-top:24px;
-        gap:16px;
-      }
+background:radial-gradient(circle, rgba(255,255,255,0.06) 0%, rgba(0,0,0,0) 70%);
+filter:blur(40px);
 
-      .socials img{
-        width:28px;
-      }
-    }
-  </style>
+z-index:-1;
+}
+
+/* logo */
+
+.logo{
+width:200px;
+}
+
+/* social icons */
+
+.socials{
+margin-top:18px;
+display:flex;
+gap:12px;
+}
+
+.socials img{
+width:22px;
+opacity:0.9;
+transition:opacity 0.2s ease, transform 0.2s ease;
+}
+
+.socials img:hover{
+opacity:1;
+transform:scale(1.08);
+}
+
+/* intro animation */
+
+@keyframes introFade{
+from{
+opacity:0;
+transform:translateY(8px);
+}
+to{
+opacity:1;
+transform:translateY(0);
+}
+}
+
+/* mobile */
+
+@media (max-width:768px){
+
+.logo{
+width:200px;
+}
+
+.socials{
+margin-top:24px;
+gap:16px;
+}
+
+.socials img{
+width:28px;
+}
+
+}
+
+</style>
+
 </head>
 
 <body>
 
-  <div class="intro">
-    <img src="logo.png" class="logo" alt="HTorino">
+<div class="intro">
 
-    <div class="socials">
-      <a href="https://open.spotify.com/playlist/5209QTHpYltiKwKntXbq2B?si=4477fa7bc3144442" target="_blank" rel="noopener noreferrer">
-        <img src="spotify-official.png" alt="Spotify">
-      </a>
+<img src="logo.png" class="logo" alt="HTorino">
 
-      <a href="https://www.instagram.com/hotel_torino" target="_blank" rel="noopener noreferrer">
-        <img src="instagram-official.png" alt="Instagram">
-      </a>
-    </div>
-  </div>
+<div class="socials">
+
+<a href="https://open.spotify.com/playlist/5209QTHpYltiKwKntXbq2B?si=4477fa7bc3144442" target="_blank" rel="noopener noreferrer">
+<img src="spotify-official.png" alt="Spotify">
+</a>
+
+<a href="https://www.instagram.com/hotel_torino" target="_blank" rel="noopener noreferrer">
+<img src="instagram-official.png" alt="Instagram">
+</a>
+
+</div>
+
+</div>
 
 </body>
 </html>
