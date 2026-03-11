@@ -2,92 +2,105 @@
 <html lang="en">
 
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HTorino</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HTorino</title>
 
-<meta property="og:title" content="Hotel Torino">
-<meta property="og:description" content="Hotel Torino">
-<meta property="og:image" content="https://htorino.pl/preview.jpg">
-<meta property="og:url" content="https://htorino.pl">
-<meta property="og:type" content="website">
+  <meta property="og:title" content="Hotel Torino">
+  <meta property="og:description" content="Hotel Torino">
+  <meta property="og:image" content="https://htorino.pl/preview.jpg">
+  <meta property="og:url" content="https://htorino.pl">
+  <meta property="og:type" content="website">
 
-<link rel="icon" type="image/png" href="https://htorino.pl/favicon.jpg">
-<link rel="apple-touch-icon" href="https://htorino.pl/favicon.jpg">
+  <link rel="icon" type="image/jpeg" href="https://htorino.pl/favicon.jpg">
+  <link rel="apple-touch-icon" href="https://htorino.pl/favicon.jpg">
 
-<style>
-body{
-margin:0;
-height:100vh;
-display:flex;
-align-items:center;
-justify-content:center;
-flex-direction:column;
-background:#0E0E0E;
-font-family:sans-serif;
-}
+  <style>
+    body{
+      margin:0;
+      height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      flex-direction:column;
+      background:#0E0E0E;
+      font-family:sans-serif;
+    }
 
-.logo{
-width:200px;
-}
+    .intro{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      opacity:0;
+      transform:translateY(8px);
+      animation:introFade 700ms ease-out forwards;
+    }
 
-.socials{
-margin-top:18px;
-display:flex;
-gap:12px;
-}
+    .logo{
+      width:200px;
+    }
 
-.socials img{
-width:22px;
-opacity:0.9;
-transition:opacity 0.2s ease, transform 0.2s ease;
-}
+    .socials{
+      margin-top:18px;
+      display:flex;
+      gap:12px;
+    }
 
-.socials img:hover{
-opacity:1;
-transform:scale(1.08);
-}
+    .socials img{
+      width:22px;
+      opacity:0.9;
+      transition:opacity 0.2s ease, transform 0.2s ease;
+    }
 
-/* mobile only */
-@media (max-width: 768px){
-.logo{
-width:200px;
-}
+    .socials img:hover{
+      opacity:1;
+      transform:scale(1.08);
+    }
 
-.socials{
-margin-top:24px;
-gap:16px;
-}
+    @keyframes introFade{
+      from{
+        opacity:0;
+        transform:translateY(8px);
+      }
+      to{
+        opacity:1;
+        transform:translateY(0);
+      }
+    }
 
-.socials img{
-width:28px;
-}
-}
+    /* mobile only */
+    @media (max-width: 768px){
+      .logo{
+        width:200px;
+      }
 
-.db4logo{
-height:22px;
-filter:invert(1);
-}
-  
-</style>
+      .socials{
+        margin-top:24px;
+        gap:16px;
+      }
 
-
-  
+      .socials img{
+        width:28px;
+      }
+    }
+  </style>
 </head>
 
 <body>
 
-<img src="logo.png" class="logo" alt="HTorino">
+  <div class="intro">
+    <img src="logo.png" class="logo" alt="HTorino">
 
-<div class="socials">
-<a href="https://open.spotify.com/playlist/5209QTHpYltiKwKntXbq2B?si=4477fa7bc3144442" target="_blank" rel="noopener noreferrer">
-<img src="spotify-official.png" alt="Spotify">
-</a>
+    <div class="socials">
+      <a href="https://open.spotify.com/playlist/5209QTHpYltiKwKntXbq2B?si=4477fa7bc3144442" target="_blank" rel="noopener noreferrer">
+        <img src="spotify-official.png" alt="Spotify">
+      </a>
 
-<a href="https://www.instagram.com/hotel_torino" target="_blank" rel="noopener noreferrer">
-<img src="instagram-official.png" alt="Instagram">
-</a>
-</div>
+      <a href="https://www.instagram.com/hotel_torino" target="_blank" rel="noopener noreferrer">
+        <img src="instagram-official.png" alt="Instagram">
+      </a>
+    </div>
+  </div>
 
 </body>
 </html>
